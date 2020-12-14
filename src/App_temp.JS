@@ -6,17 +6,16 @@ import Navbar from "./components/navBar/navbar";
 import Teams from "./containers/teams/teams";
 import {
   BrowserRouter as Router,
+  Switch,
   Route,
   Redirect,
-  Switch,
 } from "react-router-dom";
 import CreateTeam from "./containers/createTeam/createTeam";
 import Team from "./containers/teams/team/team";
-import CreatePlayer from "./containers/createPlayer/createPlayer";
 
 class App extends Component {
   state = {
-    user: { logedIn: true },
+    user: { logedIn: false },
     cards: [],
     // { id: 0, name: "D3", img: DF4 },
     // { id: 1, name: "D5", img: Bad },
@@ -38,13 +37,14 @@ class App extends Component {
   // };
 
   componentDidMount() {
+    console.log("fretching");
     fetch("http://localhost:3000/teams")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         this.setState({ cards: [...this.state.cards, ...data] });
-        console.log("fetched");
+        console.log(this.state.cards[0].img.data);
       });
   }
 
@@ -57,49 +57,33 @@ class App extends Component {
     event.preventDefault();
   };
 
-  loginHandler = (e) => {
-    let user = { ...this.state.user };
-    user.logedIn = true;
-    this.setState({ user: user });
-    console.log(this.state.user.logedIn);
-  };
+  loginHnadler = () => {};
 
   render() {
-    let show;
-    if (this.state.user.logedIn) {
-      show = (
-        <div>
-          {/* <Redirect to="/teams" /> */}
-          <Route
-            path="/teams"
-            render={(props) => (
-              <Teams
-                {...props}
-                teamDetails={this.state.cards}
-                team={this.individialTeam}
-                clickMe={this.handleCompetition}
-              />
-            )}
-          />
-          <Route path="/create-team" component={CreateTeam} />
-          <Route path="/team" component={Team} />
-          <Route path="/create-player" component={CreatePlayer} />
-        </div>
-      );
-    } else {
-      show = <Redirect to="/" />;
-    }
     return (
       <Router>
-        <Navbar />
-        <Switch>
-          {show}
+        <div>
+          <Navbar />
+          {!this.state.user.logedIn ? (
+            <Route
+              exact
+              path="/"
+              component={Login}
+              login={this.loginHnadler}
+            ></Route>
+          ) : (
+            <Redirect to="/teams" />
+          )}
           <Route
-            exact
-            path="/"
-            render={(props) => <Login {...props} login={this.loginHandler} />}
+            path="/teams"
+            component={Teams}
+            teamDetails={this.state.cards}
+            team={this.individialTeam}
+            clickMe={this.handleCompetition}
           />
-        </Switch>
+          <Route path="/createteam" component={CreateTeam} />
+          <Route path="/team" component={Team} />
+        </div>
       </Router>
     );
   }

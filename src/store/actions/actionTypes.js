@@ -1,0 +1,4 @@
+export const SELECT_AVAILABILITY = "SELECT_AVAILABILITY";
+export const MODAL_STATE = "MODAL_STATE";
+export const CLOSE_MODAL = "CLOSE_MODAL";
+   
